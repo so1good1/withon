@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Unit 03 · Sharing is Caring</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#f7f6f3;--surface:#fff;--surface2:#f0efe9;--border:rgba(0,0,0,0.08);--border2:rgba(0,0,0,0.14);--text:#1a1a18;--text2:#6b6a65;--text3:#9e9d98;--blue:#2563eb;--blue-bg:#eff4ff;--blue-text:#1d4ed8;--green:#16a34a;--green-bg:#f0fdf4;--green-text:#15803d;--green-bd:#86efac;--red-bg:#fff1f2;--red-text:#be123c;--red-bd:#fecdd3;--radius:12px;--radius-sm:8px;--pill:100px;--shadow:0 1px 3px rgba(0,0,0,0.06),0 1px 2px rgba(0,0,0,0.04);--shadow-md:0 4px 12px rgba(0,0,0,0.08)}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'DM Sans','Noto Sans KR',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;-webkit-font-smoothing:antialiased}
+header{background:var(--surface);border-bottom:1px solid var(--border);padding:0 20px;height:56px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100}
+.back-btn{display:flex;align-items:center;gap:6px;font-size:13px;font-weight:500;color:var(--text2);cursor:pointer;padding:6px 10px;border-radius:var(--radius-sm);border:none;background:none;font-family:inherit;transition:background 0.12s}
+.back-btn:hover{background:var(--surface2)}
+.header-center{text-align:center}
+.header-center p{font-size:13px;font-weight:600;color:var(--text)}
+.header-center span{font-size:11px;color:var(--text3)}
+.score-display{font-size:13px;font-weight:600;color:var(--text);min-width:60px;text-align:right}
+main{max-width:720px;margin:0 auto;padding:24px 16px 80px}
+.tabs{display:flex;gap:2px;background:var(--surface2);border-radius:var(--pill);padding:3px;margin-bottom:24px}
+.tab{flex:1;padding:8px;font-size:13px;font-weight:500;font-family:inherit;border:none;background:none;color:var(--text2);border-radius:var(--pill);cursor:pointer;transition:all 0.15s;white-space:nowrap}
+.tab.active{background:var(--surface);color:var(--text);box-shadow:var(--shadow)}
+.section{display:none}
+.section.active{display:block}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:18px 20px;margin-bottom:14px;box-shadow:var(--shadow)}
+.card-label{font-size:11px;font-weight:600;letter-spacing:0.05em;text-transform:uppercase;color:var(--text3);margin-bottom:12px}
+.passage{background:var(--surface2);border-radius:var(--radius-sm);padding:16px 18px;font-size:13px;color:var(--text2);line-height:1.9;margin-bottom:16px;border-left:3px solid var(--border2)}
+.passage b{color:var(--text);font-weight:600}
+.vocab-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px;margin-bottom:14px}
+.vocab-card{background:var(--surface2);border-radius:var(--radius-sm);padding:11px 14px;cursor:pointer;border:1.5px solid transparent;transition:border-color 0.15s,background 0.15s;user-select:none}
+.vocab-card:hover{border-color:var(--border2)}
+.vocab-card.show{border-color:var(--green-bd);background:var(--green-bg)}
+.vocab-card .en{font-size:14px;font-weight:600;color:var(--text)}
+.vocab-card.show .en{color:var(--green-text)}
+.vocab-card .ko{font-size:12px;color:var(--green-text);margin-top:3px;display:none}
+.vocab-card.show .ko{display:block}
+.vq-item{margin-bottom:12px}
+.vq-label{font-size:12px;color:var(--text2);margin-bottom:5px;font-weight:500}
+.q-block{margin-bottom:22px}
+.q-num{display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;border-radius:50%;background:var(--blue-bg);color:var(--blue-text);font-size:11px;font-weight:600;margin-right:6px;flex-shrink:0}
+.q-text{font-size:14px;color:var(--text);line-height:1.7;margin-bottom:10px}
+.opts{display:flex;flex-direction:column;gap:6px}
+.opt{display:flex;align-items:flex-start;gap:10px;padding:10px 13px;border-radius:var(--radius-sm);border:1px solid var(--border2);cursor:pointer;font-size:13px;line-height:1.5;background:var(--surface);transition:background 0.1s,border-color 0.1s;user-select:none}
+.opt:hover{background:var(--surface2)}
+.opt.selected{border-color:#93c5fd;background:#eff6ff}
+.opt.correct{border-color:var(--green-bd);background:var(--green-bg);color:var(--green-text)}
+.opt.wrong{border-color:var(--red-bd);background:var(--red-bg);color:var(--red-text)}
+.opt-n{min-width:18px;height:18px;border-radius:50%;border:1.5px solid var(--border2);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;flex-shrink:0;margin-top:1px}
+.fill-input{width:100%;padding:10px 12px;font-size:14px;font-family:inherit;border:1px solid var(--border2);border-radius:var(--radius-sm);background:var(--surface);color:var(--text);outline:none;transition:border-color 0.12s;margin-bottom:0}
+.fill-input:focus{border-color:var(--blue)}
+.fill-input.correct{border-color:var(--green);background:var(--green-bg);color:var(--green-text)}
+.fill-input.wrong{border-color:#f87171;background:var(--red-bg);color:var(--red-text)}
+textarea.fill-input{resize:vertical;min-height:80px;line-height:1.6}
+.fb{padding:10px 13px;border-radius:var(--radius-sm);font-size:13px;margin-top:8px;line-height:1.6;display:none}
+.fb.show{display:block}
+.fb.ok{background:var(--green-bg);color:var(--green-text);border:1px solid var(--green-bd)}
+.fb.no{background:var(--red-bg);color:var(--red-text);border:1px solid var(--red-bd)}
+.fb.info{background:var(--blue-bg);color:var(--blue-text);border:1px solid #bfdbfe}
+.pattern-box{background:var(--surface2);border-radius:var(--radius-sm);padding:14px 16px;margin-bottom:14px}
+.pattern-title{font-size:14px;font-weight:600;color:var(--text);margin-bottom:6px}
+.pattern-formula{font-family:monospace;font-size:13px;color:var(--blue-text);background:var(--blue-bg);padding:5px 10px;border-radius:6px;display:inline-block;margin-bottom:6px}
+.pattern-desc{font-size:12px;color:var(--text2);line-height:1.6}
+.btn{display:inline-flex;align-items:center;gap:5px;padding:8px 16px;font-size:13px;font-weight:600;font-family:inherit;border-radius:var(--radius-sm);border:1px solid var(--border2);background:var(--surface);color:var(--text);cursor:pointer;transition:background 0.12s}
+.btn:hover{background:var(--surface2)}
+.btn-primary{background:var(--text);color:#fff;border-color:var(--text)}
+.btn-primary:hover{opacity:0.85}
+.btn-sm{padding:6px 12px;font-size:12px}
+.btn-row{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}
+.result-box{padding:12px 16px;border-radius:var(--radius-sm);font-size:13px;font-weight:500;margin-top:12px;display:none}
+.result-box.show{display:block}
+.result-box.good{background:var(--green-bg);color:var(--green-text);border:1px solid var(--green-bd)}
+.result-box.bad{background:var(--red-bg);color:var(--red-text);border:1px solid var(--red-bd)}
+.ai-prompt-btns{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px}
+.ai-prompt-btn{padding:6px 13px;font-size:12px;font-weight:500;font-family:inherit;border-radius:var(--pill);border:1px solid var(--border2);background:var(--surface);color:var(--text2);cursor:pointer;transition:all 0.12s}
+.ai-prompt-btn:hover{background:var(--surface2)}
+.ai-prompt-btn.on{background:var(--blue-bg);color:var(--blue-text);border-color:#93c5fd}
+.prompt-display{background:var(--blue-bg);border:1px solid #bfdbfe;border-radius:var(--radius-sm);padding:11px 14px;font-size:13px;color:var(--blue-text);line-height:1.6;margin-bottom:10px;display:none}
+.ai-response{background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius-sm);padding:14px 16px;font-size:13px;line-height:1.8;margin-top:10px;min-height:60px;display:none;white-space:pre-wrap}
+.summary-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:16px}
+.sum-box{background:var(--surface2);border-radius:var(--radius-sm);padding:12px;text-align:center}
+.sum-n{font-size:22px;font-weight:700;color:var(--text)}
+.sum-l{font-size:11px;color:var(--text2);margin-top:2px}
+.finish-bar{position:fixed;bottom:0;left:0;right:0;background:var(--surface);border-top:1px solid var(--border);padding:12px 20px;display:flex;justify-content:center;z-index:50}
+.finish-btn{padding:12px 40px;font-size:15px;font-weight:700;font-family:inherit;background:var(--text);color:#fff;border:none;border-radius:var(--radius-sm);cursor:pointer}
+.toast{position:fixed;bottom:80px;left:50%;transform:translateX(-50%) translateY(60px);background:var(--text);color:#fff;font-size:13px;font-weight:500;padding:10px 20px;border-radius:var(--pill);z-index:999;transition:transform 0.3s cubic-bezier(0.34,1.56,0.64,1);pointer-events:none;white-space:nowrap}
+.toast.show{transform:translateX(-50%) translateY(0)}
+.spinner{display:inline-block;width:13px;height:13px;border:2px solid rgba(255,255,255,0.3);border-top-color:#fff;border-radius:50%;animation:spin 0.7s linear infinite;vertical-align:middle;margin-right:5px}
+@keyframes spin{to{transform:rotate(360deg)}}
+.sub-box{background:var(--surface2);border-radius:var(--radius-sm);padding:10px 13px;font-size:13px;color:var(--text2);margin-bottom:8px;line-height:1.7}
+@media(max-width:480px){main{padding:16px 12px 80px}.vocab-grid{grid-template-columns:repeat(2,1fr)}.tabs .tab{font-size:12px;padding:7px 6px}}
+</style>
+</head>
+<body>
+
+<header>
+  <button class="back-btn" onclick="goBack()">
+    <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+      <path d="M10 12L6 8l4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+    허브로
+  </button>
+  <div class="header-center">
+    <p>Unit 03 · Sharing is Caring</p>
+    <span>기부·나눔 | 152 words</span>
+  </div>
+  <div class="score-display" id="headerScore">—</div>
+</header>
+
+<main>
+  <div class="tabs">
+    <button class="tab active" onclick="switchTab('vocab',this)">어휘</button>
+    <button class="tab" onclick="switchTab('reading',this)">독해</button>
+    <button class="tab" onclick="switchTab('grammar',this)">문법</button>
+  </div>
+
+  <!-- 어휘 탭 -->
+  <div id="tab-vocab" class="section active">
+    <div class="card">
+      <div class="card-label">플래시카드 — 눌러서 뜻 확인</div>
+      <div class="vocab-grid" id="vocabGrid"></div>
+      <div class="btn-row">
+        <button class="btn btn-sm" onclick="revealAll()">전체 보기</button>
+        <button class="btn btn-sm" onclick="hideAll()">전체 숨기기</button>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-label">빈칸 채우기 — 한국어 뜻을 보고 영단어 입력</div>
+      <div id="vocabQuiz"></div>
+      <div class="btn-row">
+        <button class="btn btn-primary btn-sm" onclick="checkVocab()">채점</button>
+        <button class="btn btn-sm" onclick="resetVocab()">다시 풀기</button>
+      </div>
+      <div class="result-box" id="vocabResult"></div>
+    </div>
+  </div>
+
+  <!-- 독해 탭 -->
+  <div id="tab-reading" class="section">
+    <div class="card">
+      <div class="card-label">본문</div>
+      <div class="passage">
+        A recent report states an interesting fact about donations. People who donated <b>continuously</b> from their youth donate 12% more than those who didn't. It shows that it's very important to <b>get used to</b> sharing from an early age. So countries such as England <b>include</b> donations at their school events.<br><br>
+        Every year, schools in England <b>choose</b> a place to donate. Then, they <b>encourage</b> their students to <b>participate in</b> activities to <b>raise money</b>. ________, students donate one penny every time they jump rope. So the more they jump rope, the more money they can donate. In addition, students sell cake and chocolate during lunchtime. They sometimes run a mini-marathon with teachers to raise money, too. Those experiences make both students and their parents <b>proud</b> because they believe donations can <b>improve</b> their society.<br><br>
+        In England, it is schools that participate in donations the most actively. They teach students to continue sharing throughout their lives.
+      </div>
+    </div>
+    <div class="card">
+      <div id="readingQs"></div>
+      <div class="btn-row">
+        <button class="btn btn-primary btn-sm" onclick="checkReading()">채점</button>
+        <button class="btn btn-sm" onclick="resetReading()">다시 풀기</button>
+      </div>
+      <div class="result-box" id="readingResult"></div>
+    </div>
+  </div>
+
+  <!-- 문법 탭 -->
+  <div id="tab-grammar" class="section">
+    <div class="card">
+      <div class="pattern-box">
+        <div class="pattern-title">to부정사 목적격 보어</div>
+        <div class="pattern-formula">동사 + 목적어 + to부정사</div>
+        <div class="pattern-desc">ask, want, encourage, tell, expect 등이 이 패턴을 사용해요.<br>예) They <b>encourage</b> their students <b>to participate in</b> activities.</div>
+      </div>
+      <div id="grammarQs"></div>
+      <div class="btn-row">
+        <button class="btn btn-primary btn-sm" onclick="checkGrammar()">채점</button>
+        <button class="btn btn-sm" onclick="resetGrammar()">다시 풀기</button>
+      </div>
+      <div class="result-box" id="grammarResult"></div>
+    </div>
+  </div>
+
+</main>
+
+<div class="toast" id="toast"></div>
+
+<script>
+var UNIT_NUM = 3;
+
+var params = new URLSearchParams(window.location.search);
+var SID    = params.get('sid');
+var SNAME  = params.get('name');
+var SCLASS = params.get('class');
+
+var VOCAB = [
+  {en:"donation",       ko:"기부"},
+  {en:"continuously",   ko:"계속해서, 끊임없이"},
+  {en:"get used to",    ko:"~에 익숙해지다"},
+  {en:"participate in", ko:"~에 참여하다"},
+  {en:"raise money",    ko:"기부금을 모으다"},
+  {en:"include",        ko:"포함하다"},
+  {en:"encourage",      ko:"격려하다"},
+  {en:"improve",        ko:"개선하다, 나아지다"},
+  {en:"proud",          ko:"자랑스러워하는"},
+  {en:"youth",          ko:"어린 시절"},
+  {en:"throughout",     ko:"~동안 쭉, 내내"},
+  {en:"donate",         ko:"기부하다"}
+];
+
+var READING_QS = [
+  {
+    q:"이 글의 제목으로 가장 적절한 것은?",
+    opts:["A Donating Campaign Around the World","Sharing Activities at English Schools","Donations Always Make People Proud","Why Sharing Is Good","Interesting Schools in England"],
+    ans:1, multi:false,
+    exp:"영국 학교들의 다양한 기부 활동을 소개하는 글이므로 ② Sharing Activities at English Schools가 적절해요."
+  },
+  {
+    q:"빈칸에 들어갈 연결어로 가장 적절한 것은?",
+    opts:["However","In addition","For example","By contrast","Instead"],
+    ans:2, multi:false,
+    exp:"앞 문장에서 기부 활동에 참여한다고 했고, 뒤에 구체적 예시가 나오므로 'For example'이 정답이에요."
+  },
+  {
+    q:"이 글을 통해 알 수 있는 내용을 모두 고르시오. (2개)",
+    opts:["영국 학교는 매년 기부할 곳을 선정한다.","졸업 기념으로 기부 활동을 한다.","점심시간에 미니마라톤을 하기도 한다.","기부 경험은 학생과 학부모 모두에게 자부심을 준다.","고학년 학생들에게만 기부 행사 기회가 주어진다."],
+    ans:[0,3], multi:true,
+    exp:"①과 ④가 정답이에요. 미니마라톤은 점심시간이 아닌 선생님과 함께 하는 활동이에요."
+  }
+];
+
+var GRAMMAR_QS = [
+  {
+    q:"우리말과 같은 뜻이 되도록 단어를 올바르게 배열하세요.",
+    sub:"나의 부모님께서는 항상 내가 돈을 은행에 저금하도록 격려하신다.",
+    hint:"to save / money / always / my parents / me / in the bank / encourage",
+    ans:"My parents always encourage me to save money in the bank"
+  },
+  {
+    q:"괄호 안의 동사를 알맞은 형태로 바꿔 쓰세요.",
+    sub:"The teacher asked us _______ (be) quiet during the test.",
+    hint:"ask + 목적어 + to부정사",
+    ans:"to be"
+  },
+  {
+    q:"다음 문장에서 틀린 부분을 찾아 올바르게 고쳐 쓰세요.",
+    sub:"She wants me helping her with the project.",
+    hint:"want + 목적어 + to부정사 패턴 생각해보기",
+    ans:"to help"
+  },
+  {
+    q:"우리말을 영어로 쓰세요. (to부정사 패턴 사용)",
+    sub:"선생님은 우리가 매일 영어를 공부하기를 원하신다.",
+    hint:"want + 목적어 + to부정사",
+    ans:"The teacher wants us to study English every day"
+  }
+];
+
+
+function switchTab(name, btn) {
+  document.querySelectorAll('.tab').forEach(function(t){ t.classList.remove('active'); });
+  btn.classList.add('active');
+  document.querySelectorAll('.section').forEach(function(s){ s.classList.remove('active'); });
+  document.getElementById('tab-' + name).classList.add('active');
+}
+
+function buildVocab() {
+  var grid = document.getElementById('vocabGrid');
+  grid.innerHTML = VOCAB.map(function(v, i){
+    return '<div class="vocab-card" id="vc-' + i + '" onclick="toggleVocab(' + i + ')">' +
+      '<div class="en">' + v.en + '</div>' +
+      '<div class="ko">' + v.ko + '</div>' +
+      '</div>';
+  }).join('');
+
+  var quiz = document.getElementById('vocabQuiz');
+  quiz.innerHTML = VOCAB.slice(0,8).map(function(v, i){
+    return '<div class="vq-item">' +
+      '<div class="vq-label">' + v.ko + '</div>' +
+      '<input type="text" class="fill-input" id="vq-' + i + '" placeholder="영단어 입력..." autocomplete="off">' +
+      '</div>';
+  }).join('');
+}
+
+function toggleVocab(i) { document.getElementById('vc-' + i).classList.toggle('show'); }
+function revealAll() { VOCAB.forEach(function(_,i){ document.getElementById('vc-'+i).classList.add('show'); }); }
+function hideAll()   { VOCAB.forEach(function(_,i){ document.getElementById('vc-'+i).classList.remove('show'); }); }
+
+function checkVocab() {
+  var correct = 0;
+  VOCAB.slice(0,8).forEach(function(v,i){
+    var inp = document.getElementById('vq-' + i);
+    var ok = inp.value.trim().toLowerCase() === v.en.toLowerCase();
+    inp.classList.toggle('correct', ok);
+    inp.classList.toggle('wrong', !ok);
+    if (ok) correct++;
+    else if (!inp.value.trim()) inp.placeholder = '정답: ' + v.en;
+  });
+  var pct = Math.round((correct/8)*100);
+  scores.vocab = pct;
+  var el = document.getElementById('vocabResult');
+  el.className = 'result-box show ' + (pct>=70?'good':'bad');
+  el.textContent = correct + '/8 정답 (' + pct + '%) ' + (pct>=70?'— 잘 했어요!':'— 틀린 단어를 다시 확인해보세요.');
+  updateHeader();
+}
+
+function resetVocab() {
+  VOCAB.slice(0,8).forEach(function(_,i){
+    var inp = document.getElementById('vq-'+i);
+    inp.value=''; inp.className='fill-input'; inp.placeholder='영단어 입력...';
+  });
+  document.getElementById('vocabResult').className='result-box';
+  scores.vocab=null; updateHeader();
+}
+
+function buildReading() {
+  document.getElementById('readingQs').innerHTML = READING_QS.map(function(q, qi){
+    var opts = q.opts.map(function(o, oi){
+      var fn = q.multi ? 'toggleMulti('+qi+','+oi+')' : 'pickOpt('+qi+','+oi+')';
+      return '<div class="opt" id="ro-'+qi+'-'+oi+'" onclick="'+fn+'">' +
+        '<div class="opt-n">'+(oi+1)+'</div><span>'+o+'</span></div>';
+    }).join('');
+    return '<div class="q-block"><div class="q-text"><span class="q-num">'+(qi+1)+'</span>'+q.q+'</div>' +
+      '<div class="opts" id="ropts-'+qi+'">'+opts+'</div>' +
+      '<div class="fb" id="rfb-'+qi+'"></div></div>';
+  }).join('');
+}
+
+function pickOpt(qi, oi) {
+  if (rSelected[qi] !== undefined) document.getElementById('ro-'+qi+'-'+rSelected[qi]).classList.remove('selected');
+  rSelected[qi] = oi;
+  document.getElementById('ro-'+qi+'-'+oi).classList.add('selected');
+}
+
+function toggleMulti(qi, oi) {
+  if (!rMulti[qi]) rMulti[qi] = [];
+  var idx = rMulti[qi].indexOf(oi);
+  var el = document.getElementById('ro-'+qi+'-'+oi);
+  if (idx === -1) { rMulti[qi].push(oi); el.classList.add('selected'); }
+  else { rMulti[qi].splice(idx,1); el.classList.remove('selected'); }
+}
+
+function checkReading() {
+  var correct = 0;
+  READING_QS.forEach(function(q, qi){
+    var fb = document.getElementById('rfb-'+qi);
+    var ok = false;
+    if (q.multi) {
+      var sel = (rMulti[qi]||[]).slice().sort().join(',');
+      ok = sel === q.ans.slice().sort().join(',');
+      q.opts.forEach(function(_,oi){
+        var el = document.getElementById('ro-'+qi+'-'+oi);
+        el.classList.remove('selected');
+        if (q.ans.indexOf(oi)!==-1) el.classList.add('correct');
+        else if ((rMulti[qi]||[]).indexOf(oi)!==-1) el.classList.add('wrong');
+      });
+    } else {
+      ok = rSelected[qi] === q.ans;
+      q.opts.forEach(function(_,oi){
+        var el = document.getElementById('ro-'+qi+'-'+oi);
+        el.classList.remove('selected');
+        if (oi===q.ans) el.classList.add('correct');
+        else if (oi===rSelected[qi]) el.classList.add('wrong');
+      });
+    }
+    if (ok) correct++;
+    fb.className = 'fb show ' + (ok?'ok':'no');
+    fb.textContent = (ok?'정답! — ':'오답 — ') + q.exp;
+  });
+  var pct = Math.round((correct/READING_QS.length)*100);
+  scores.reading = pct;
+  var el = document.getElementById('readingResult');
+  el.className = 'result-box show ' + (pct>=70?'good':'bad');
+  el.textContent = correct + '/' + READING_QS.length + ' 정답 (' + pct + '%)';
+  updateHeader();
+}
+
+function resetReading() {
+  rSelected={}; rMulti={};
+  buildReading();
+  document.getElementById('readingResult').className='result-box';
+  scores.reading=null; updateHeader();
+}
+
+function buildGrammar() {
+  document.getElementById('grammarQs').innerHTML = GRAMMAR_QS.map(function(q, i){
+    return '<div class="q-block">' +
+      '<div class="q-text"><span class="q-num">'+(i+1)+'</span>'+q.q+'</div>' +
+      '<div class="sub-box">'+q.sub+'</div>' +
+      '<div style="font-size:12px;color:var(--text3);margin-bottom:6px">힌트: '+q.hint+'</div>' +
+      '<input type="text" class="fill-input" id="gq-'+i+'" placeholder="답을 입력하세요..." autocomplete="off">' +
+      '<div class="fb" id="gfb-'+i+'"></div></div>';
+  }).join('');
+}
+
+function checkGrammar() {
+  var correct = 0;
+  GRAMMAR_QS.forEach(function(q, i){
+    var inp = document.getElementById('gq-'+i);
+    var ok = inp.value.trim().toLowerCase().replace(/\.$/,'') === q.ans.toLowerCase().replace(/\.$/,'');
+    if (ok) correct++;
+    inp.classList.toggle('correct', ok);
+    inp.classList.toggle('wrong', !ok);
+    var fb = document.getElementById('gfb-'+i);
+    fb.className = 'fb show ' + (ok?'ok':'no');
+    fb.textContent = ok ? '정답!' : '오답 — 정답: ' + q.ans;
+  });
+  var pct = Math.round((correct/GRAMMAR_QS.length)*100);
+  scores.grammar = pct;
+  var el = document.getElementById('grammarResult');
+  el.className = 'result-box show ' + (pct>=70?'good':'bad');
+  el.textContent = correct + '/' + GRAMMAR_QS.length + ' 정답 (' + pct + '%)';
+  updateHeader();
+}
+
+function resetGrammar() {
+  buildGrammar();
+  document.getElementById('grammarResult').className='result-box';
+  scores.grammar=null; updateHeader();
+}
+
+
+
+
+function updateHeader() {
+  var vals = Object.values(scores).filter(function(v){ return v !== null; });
+  var avg = vals.length ? Math.round(vals.reduce(function(a,b){return a+b;},0)/vals.length) : null;
+  document.getElementById('headerScore').textContent = avg !== null ? avg+'점' : '—';
+}
+
+function finishUnit() {
+  var vals = Object.values(scores).filter(function(v){ return v !== null; });
+  if (!vals.length) { toast('먼저 한 탭이라도 채점해보세요!'); return; }
+  var avg = Math.round(vals.reduce(function(a,b){return a+b;},0)/vals.length);
+  toast(avg+'점 저장됐어요! 허브로 돌아갈게요 🎉', 1800);
+  setTimeout(function(){
+    window.location.href = 'index.html?score=' + avg + '&unit=' + UNIT_NUM;
+  }, 1900);
+}
+
+function goBack() {
+  window.location.href = 'index.html';
+}
+
+buildVocab();
+buildReading();
+buildGrammar();
+</script>
+</body>
+</html>
