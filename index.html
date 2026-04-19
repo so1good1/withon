@@ -1,0 +1,524 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>위드온학원 · 복습 허브</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:#f7f6f3; --surface:#fff; --surface2:#f0efe9;
+    --border:rgba(0,0,0,0.08); --border2:rgba(0,0,0,0.14);
+    --text:#1a1a18; --text2:#6b6a65; --text3:#9e9d98;
+    --blue:#2563eb; --blue-bg:#eff4ff; --blue-text:#1d4ed8;
+    --green:#16a34a; --green-bg:#f0fdf4; --green-text:#15803d; --green-bd:#86efac;
+    --amber-bg:#fffbeb; --amber-text:#92400e;
+    --red-bg:#fff1f2; --red-text:#be123c;
+    --radius:12px; --radius-sm:8px; --pill:100px;
+    --shadow:0 1px 3px rgba(0,0,0,0.06),0 1px 2px rgba(0,0,0,0.04);
+    --shadow-md:0 4px 12px rgba(0,0,0,0.08),0 2px 4px rgba(0,0,0,0.04);
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:'DM Sans','Noto Sans KR',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;-webkit-font-smoothing:antialiased}
+  header{background:var(--surface);border-bottom:1px solid var(--border);padding:0 24px;height:60px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100}
+  .logo{display:flex;align-items:center;gap:10px}
+  .logo-mark{width:32px;height:32px;background:var(--text);border-radius:8px;display:flex;align-items:center;justify-content:center;color:#fff;font-size:13px;font-weight:700}
+  .logo-text{font-size:15px;font-weight:600}
+  .logo-sub{font-size:12px;color:var(--text3);margin-top:1px}
+  .user-chip{display:flex;align-items:center;gap:8px;padding:5px 12px 5px 6px;border-radius:var(--pill);border:1px solid var(--border2);background:var(--surface);cursor:pointer;font-size:13px;color:var(--text2);transition:background 0.12s}
+  .user-chip:hover{background:var(--surface2)}
+  .avatar{width:26px;height:26px;border-radius:50%;background:var(--text);color:#fff;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600}
+  /* 로그인 */
+  .login-wrap{min-height:calc(100vh - 60px);display:flex;align-items:center;justify-content:center;padding:20px}
+  .login-card{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:36px;width:100%;max-width:360px;box-shadow:var(--shadow-md);text-align:center}
+  .login-card h2{font-size:20px;font-weight:700;margin-bottom:6px}
+  .login-card p{font-size:13px;color:var(--text2);margin-bottom:28px;line-height:1.6}
+  .form-group{text-align:left;margin-bottom:14px}
+  .form-group label{display:block;font-size:12px;font-weight:600;color:var(--text2);margin-bottom:5px}
+  .form-group input,.form-group select{width:100%;padding:10px 12px;font-size:14px;font-family:inherit;border:1px solid var(--border2);border-radius:var(--radius-sm);background:var(--surface);color:var(--text);outline:none;transition:border-color 0.12s}
+  .form-group input:focus,.form-group select:focus{border-color:var(--blue)}
+  .login-btn{width:100%;padding:13px;font-size:15px;font-weight:600;font-family:inherit;background:var(--text);color:#fff;border:none;border-radius:var(--radius-sm);cursor:pointer;margin-top:8px;transition:opacity 0.12s}
+  .login-btn:hover{opacity:0.85}
+  .login-btn:disabled{opacity:0.5;cursor:default}
+  .login-error{font-size:12px;color:var(--red-text);margin-top:8px;display:none}
+  /* 메인 */
+  main{max-width:900px;margin:0 auto;padding:28px 20px 60px;display:none}
+  .dashboard{background:var(--surface);border-radius:var(--radius);border:1px solid var(--border);padding:24px;margin-bottom:20px;box-shadow:var(--shadow)}
+  .dashboard h2{font-size:17px;font-weight:600;margin-bottom:3px}
+  .dashboard p{font-size:13px;color:var(--text2);margin-bottom:18px}
+  .stat-row{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:18px}
+  .stat-box{background:var(--surface2);border-radius:var(--radius-sm);padding:14px;text-align:center}
+  .stat-box .n{font-size:26px;font-weight:700;line-height:1}
+  .stat-box .l{font-size:11px;color:var(--text2);margin-top:4px;font-weight:500}
+  .progress-header{display:flex;justify-content:space-between;margin-bottom:8px}
+  .progress-header span{font-size:13px;color:var(--text2);font-weight:500}
+  .progress-header strong{font-size:13px;font-weight:600}
+  .progress-track{background:var(--surface2);border-radius:var(--pill);height:8px;overflow:hidden}
+  .progress-fill{height:100%;background:var(--text);border-radius:var(--pill);transition:width 0.5s cubic-bezier(0.4,0,0.2,1)}
+  /* 컨트롤 */
+  .controls{display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap;align-items:center}
+  .filter-group{display:flex;gap:4px}
+  .f-btn{padding:7px 14px;font-size:13px;font-weight:500;font-family:inherit;border-radius:var(--pill);border:1px solid var(--border2);background:var(--surface);color:var(--text2);cursor:pointer;transition:all 0.12s}
+  .f-btn:hover{background:var(--surface2);color:var(--text)}
+  .f-btn.on{background:var(--text);color:#fff;border-color:var(--text)}
+  .search-box{flex:1;min-width:160px;display:flex;align-items:center;background:var(--surface);border:1px solid var(--border2);border-radius:var(--radius-sm);padding:0 12px;gap:8px}
+  .search-box input{flex:1;border:none;outline:none;font-size:13px;font-family:inherit;background:transparent;color:var(--text);height:36px}
+  .search-box input::placeholder{color:var(--text3)}
+  /* 그리드 */
+  .section-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+  .section-label{font-size:11px;font-weight:600;letter-spacing:0.06em;text-transform:uppercase;color:var(--text3)}
+  .section-count{font-size:12px;color:var(--text3)}
+  .unit-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px;margin-bottom:28px}
+  .unit-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:14px;cursor:pointer;position:relative;transition:transform 0.12s,box-shadow 0.12s,border-color 0.12s;box-shadow:var(--shadow);user-select:none}
+  .unit-card:hover{transform:translateY(-2px);box-shadow:var(--shadow-md);border-color:var(--border2)}
+  .unit-card:active{transform:scale(0.98)}
+  .unit-card.done{border-color:var(--green-bd);background:var(--green-bg)}
+  .unit-card.locked{opacity:0.5;cursor:default}
+  .unit-card.locked:hover{transform:none;box-shadow:var(--shadow)}
+  .unit-num{font-size:11px;font-weight:600;letter-spacing:0.03em;color:var(--text3);margin-bottom:5px;display:flex;align-items:center;gap:5px}
+  .dot{width:6px;height:6px;border-radius:50%;flex-shrink:0}
+  .dot-done{background:var(--green)}.dot-open{background:var(--blue)}.dot-lock{background:var(--text3)}
+  .unit-name{font-size:13px;font-weight:600;line-height:1.35;margin-bottom:4px}
+  .unit-card.done .unit-name{color:var(--green-text)}
+  .unit-topic{font-size:11px;color:var(--text3)}
+  .unit-card.done .unit-topic{color:var(--green)}
+  .score-chip{position:absolute;top:10px;right:10px;font-size:10px;font-weight:600;padding:2px 7px;border-radius:var(--pill);background:#dcfce7;color:var(--green-text)}
+  .new-chip{position:absolute;top:10px;right:10px;font-size:10px;font-weight:600;padding:2px 7px;border-radius:var(--pill);background:var(--blue-bg);color:var(--blue-text)}
+  /* 모달 */
+  .modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.4);z-index:200;align-items:center;justify-content:center;padding:20px}
+  .modal-overlay.open{display:flex}
+  .modal{background:var(--surface);border-radius:16px;width:100%;max-width:400px;padding:28px;box-shadow:0 20px 48px rgba(0,0,0,0.18);animation:popIn 0.18s cubic-bezier(0.34,1.56,0.64,1)}
+  @keyframes popIn{from{transform:scale(0.92);opacity:0}to{transform:scale(1);opacity:1}}
+  .modal-tag{display:inline-block;font-size:11px;font-weight:600;padding:3px 10px;border-radius:var(--pill);margin-bottom:12px}
+  .tag-done{background:var(--green-bg);color:var(--green-text)}
+  .tag-open{background:var(--blue-bg);color:var(--blue-text)}
+  .tag-lock{background:var(--amber-bg);color:var(--amber-text)}
+  .modal h3{font-size:18px;font-weight:700;margin-bottom:6px;line-height:1.3}
+  .modal-meta{font-size:13px;color:var(--text2);margin-bottom:16px;line-height:1.6}
+  .grammar-tags{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:20px}
+  .g-tag{font-size:11px;font-weight:500;padding:3px 9px;border-radius:var(--pill);background:#f3f4ff;color:#4338ca}
+  .modal-score{background:var(--green-bg);border:1px solid var(--green-bd);border-radius:var(--radius-sm);padding:12px 16px;margin-bottom:16px;display:flex;align-items:center;justify-content:space-between}
+  .modal-score span{font-size:13px;color:var(--green-text);font-weight:500}
+  .modal-score strong{font-size:20px;font-weight:700;color:var(--green)}
+  .btn-row{display:flex;flex-direction:column;gap:8px}
+  .btn-main{width:100%;padding:13px;font-size:14px;font-weight:600;font-family:inherit;background:var(--text);color:#fff;border:none;border-radius:var(--radius-sm);cursor:pointer;transition:opacity 0.12s}
+  .btn-main:hover{opacity:0.85}
+  .btn-sub{width:100%;padding:11px;font-size:13px;font-weight:500;font-family:inherit;background:var(--surface2);color:var(--text2);border:1px solid var(--border2);border-radius:var(--radius-sm);cursor:pointer}
+  /* 토스트 */
+  .toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);background:var(--text);color:#fff;font-size:13px;font-weight:500;padding:10px 20px;border-radius:var(--pill);z-index:999;transition:transform 0.3s cubic-bezier(0.34,1.56,0.64,1);pointer-events:none}
+  .toast.show{transform:translateX(-50%) translateY(0)}
+  .legend{display:flex;gap:16px;flex-wrap:wrap;font-size:12px;color:var(--text3);margin-top:4px}
+  .legend-item{display:flex;align-items:center;gap:5px}
+  .empty-state{grid-column:1/-1;padding:40px;text-align:center;color:var(--text3);font-size:14px}
+  .spinner{display:inline-block;width:14px;height:14px;border:2px solid rgba(255,255,255,0.3);border-top-color:#fff;border-radius:50%;animation:spin 0.7s linear infinite;vertical-align:middle;margin-right:6px}
+  @keyframes spin{to{transform:rotate(360deg)}}
+  @media(max-width:480px){main{padding:16px 12px 60px}.unit-grid{grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:8px}.stat-box .n{font-size:22px}}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">
+    <div class="logo-mark">위드</div>
+    <div>
+      <div class="logo-text">위드온학원</div>
+      <div class="logo-sub">복습 허브</div>
+    </div>
+  </div>
+  <div id="userChip" class="user-chip" onclick="showLogoutConfirm()" style="display:none">
+    <div class="avatar" id="avatarText">?</div>
+    <span id="userName">-</span>
+  </div>
+</header>
+
+<!-- 로그인 화면 -->
+<div class="login-wrap" id="loginWrap">
+  <div class="login-card">
+    <div style="font-size:36px;margin-bottom:14px">📚</div>
+    <h2>위드온학원 복습 허브</h2>
+    <p>이름과 반을 입력하면<br>나의 학습 기록이 저장돼요</p>
+    <div class="form-group">
+      <label>이름</label>
+      <input type="text" id="inputName" placeholder="홍길동" maxlength="10" autocomplete="off"
+        onkeydown="if(event.key==='Enter') doLogin()">
+    </div>
+    <div class="form-group">
+      <label>반</label>
+      <select id="inputClass">
+        <option value="">학년을 선택하세요</option>
+        <option value="" disabled style="color:#bbb;font-size:11px">── 초등부 ──</option>
+        <option value="초4">초등 4학년</option>
+        <option value="초5">초등 5학년</option>
+        <option value="초6">초등 6학년</option>
+        <option value="" disabled style="color:#bbb;font-size:11px">── 중등부 ──</option>
+        <option value="중1">중학교 1학년</option>
+        <option value="중2">중학교 2학년</option>
+        <option value="중3">중학교 3학년</option>
+      </select>
+    </div>
+    <button class="login-btn" id="loginBtn" onclick="doLogin()">시작하기</button>
+    <div class="login-error" id="loginError"></div>
+  </div>
+</div>
+
+<!-- 메인 허브 -->
+<main id="mainWrap">
+  <div class="dashboard">
+    <h2 id="dashTitle">나의 학습 현황</h2>
+    <p id="dashSub">전체 40 유닛 · 복습 앱이 있는 유닛을 눌러 시작하세요</p>
+    <div class="stat-row">
+      <div class="stat-box"><div class="n" id="sDone">0</div><div class="l">완료한 유닛</div></div>
+      <div class="stat-box"><div class="n" id="sAvg">—</div><div class="l">평균 점수</div></div>
+      <div class="stat-box"><div class="n" id="sLeft">40</div><div class="l">남은 유닛</div></div>
+    </div>
+    <div class="progress-header">
+      <span>전체 진도</span><strong id="sPct">0%</strong>
+    </div>
+    <div class="progress-track"><div class="progress-fill" id="pBar" style="width:0%"></div></div>
+  </div>
+
+  <div class="controls">
+    <div class="filter-group">
+      <button class="f-btn on" onclick="setFilter('all',this)">전체</button>
+      <button class="f-btn" onclick="setFilter('open',this)">열린 유닛</button>
+      <button class="f-btn" onclick="setFilter('done',this)">완료</button>
+    </div>
+    <div class="search-box">
+      <svg width="14" height="14" viewBox="0 0 16 16" fill="none">
+        <circle cx="7" cy="7" r="5" stroke="#1a1a18" stroke-width="1.5"/>
+        <path d="M11 11l3 3" stroke="#1a1a18" stroke-width="1.5" stroke-linecap="round"/>
+      </svg>
+      <input type="text" placeholder="유닛 번호 또는 제목 검색..." oninput="doSearch(this.value)">
+    </div>
+  </div>
+
+  <div class="section-row">
+    <span class="section-label">유닛 목록</span>
+    <span class="section-count" id="gridCount">40개</span>
+  </div>
+  <div class="unit-grid" id="unitGrid"></div>
+
+  <div class="legend">
+    <div class="legend-item"><span class="dot dot-done"></span> 완료</div>
+    <div class="legend-item"><span class="dot dot-open"></span> 복습 앱 준비됨</div>
+    <div class="legend-item"><span class="dot dot-lock"></span> 앱 미생성</div>
+  </div>
+</main>
+
+<!-- 유닛 모달 -->
+<div class="modal-overlay" id="modalOverlay">
+  <div class="modal"><div id="modalInner"></div></div>
+</div>
+
+<!-- 로그아웃 확인 모달 -->
+<div class="modal-overlay" id="logoutOverlay">
+  <div class="modal">
+    <h3 style="margin-bottom:8px">로그아웃</h3>
+    <p style="font-size:13px;color:var(--text2);margin-bottom:20px;line-height:1.6">
+      <span id="logoutName"></span>님, 로그아웃 하시겠어요?<br>
+      학습 기록은 서버에 안전하게 저장돼 있어요.
+    </p>
+    <div class="btn-row">
+      <button class="btn-main" onclick="doLogout()">로그아웃</button>
+      <button class="btn-sub" onclick="document.getElementById('logoutOverlay').classList.remove('open')">취소</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+/* ════════════════════════════════════════════════
+   ★ Apps Script 배포 후 받은 웹앱 URL로 교체하세요
+   ════════════════════════════════════════════════ */
+const SCRIPT_URL = "여기에_Apps_Script_웹앱_URL_붙여넣기";
+
+const UNITS = [
+  {n:1,  title:"Nice to Meet You",                 topic:"자기소개·인사",    words:148, tags:["be동사","대명사"],          open:false},
+  {n:2,  title:"My School Life",                    topic:"학교생활",          words:156, tags:["일반동사","빈도부사"],       open:false},
+  {n:3,  title:"Sharing is Caring",                 topic:"기부·나눔",         words:152, tags:["to부정사","연결어"],         open:true,  file:"unit03.html", isNew:true},
+  {n:4,  title:"Food Around the World",             topic:"세계 음식 문화",    words:163, tags:["비교급","최상급"],           open:false},
+  {n:5,  title:"My Neighborhood",                   topic:"동네·장소",         words:145, tags:["전치사","There is/are"],     open:false},
+  {n:6,  title:"Healthy Habits",                    topic:"건강한 생활",       words:170, tags:["should","must"],             open:false},
+  {n:7,  title:"Nature's Wonders",                  topic:"자연 현상",         words:181, tags:["수동태","현재완료"],          open:false},
+  {n:8,  title:"Travel Stories",                    topic:"여행 경험",         words:158, tags:["과거시제","현재완료"],        open:false},
+  {n:9,  title:"Technology Today",                  topic:"현대 기술",         words:174, tags:["관계대명사","접속사"],        open:false},
+  {n:10, title:"Art and Culture",                   topic:"예술·문화",         words:167, tags:["동명사","to부정사"],          open:false},
+  {n:11, title:"Sports Heroes",                     topic:"스포츠 영웅",       words:155, tags:["과거시제","부사"],           open:false},
+  {n:12, title:"Space Exploration",                 topic:"우주 탐험",         words:188, tags:["미래시제","조동사"],          open:false},
+  {n:13, title:"Animal Kingdom",                    topic:"동물의 세계",       words:162, tags:["비교급","수동태"],           open:false},
+  {n:14, title:"Music Moves Us",                    topic:"음악의 힘",         words:149, tags:["사역동사","지각동사"],        open:false},
+  {n:15, title:"Dream Jobs",                        topic:"직업·꿈",           words:171, tags:["to부정사","want to"],        open:false},
+  {n:16, title:"Environmental Issues",              topic:"환경 문제",         words:185, tags:["현재완료","수동태"],          open:false},
+  {n:17, title:"Family Matters",                    topic:"가족 관계",         words:153, tags:["소유격","재귀대명사"],        open:false},
+  {n:18, title:"Social Media",                      topic:"SNS·미디어",        words:177, tags:["현재분사","과거분사"],        open:false},
+  {n:19, title:"Volunteer Spirit",                  topic:"봉사 정신",         words:160, tags:["접속사","조동사"],           open:false},
+  {n:20, title:"World Festivals",                   topic:"세계 축제",         words:168, tags:["수동태","전치사"],           open:false},
+  {n:21, title:"Reading for Fun",                   topic:"독서 습관",         words:143, tags:["관계대명사","명사절"],        open:false},
+  {n:22, title:"Climate Change",                    topic:"기후 변화",         words:192, tags:["현재완료","조동사"],          open:false},
+  {n:23, title:"Fashion & Identity",                topic:"패션·정체성",       words:165, tags:["형용사절","부사절"],          open:false},
+  {n:24, title:"Inventions That Changed the World", topic:"위대한 발명",       words:201, tags:["수동태","과거완료"],          open:false},
+  {n:25, title:"Kindness Counts",                   topic:"친절의 힘",         words:154, tags:["that절","명사절"],           open:false},
+  {n:26, title:"Mind Your Manners",                 topic:"예절·매너",         words:159, tags:["조동사","명령문"],           open:false},
+  {n:27, title:"Movie Magic",                       topic:"영화 산업",         words:173, tags:["분사","수동태"],            open:false},
+  {n:28, title:"The Power of Words",                topic:"언어의 힘",         words:166, tags:["간접화법","접속사"],          open:false},
+  {n:29, title:"Extreme Sports",                    topic:"익스트림 스포츠",   words:178, tags:["가정법","조건문"],           open:false},
+  {n:30, title:"Future Cities",                     topic:"미래 도시",         words:183, tags:["미래완료","가정법"],          open:false},
+  {n:31, title:"Cultural Exchange",                 topic:"문화 교류",         words:161, tags:["비교구문","접속사"],          open:false},
+  {n:32, title:"Robots and AI",                     topic:"로봇·인공지능",     words:196, tags:["수동태","분사구문"],          open:false},
+  {n:33, title:"Ocean Life",                        topic:"해양 생물",         words:169, tags:["관계부사","전치사"],          open:false},
+  {n:34, title:"Sleep Science",                     topic:"수면 과학",         words:157, tags:["명사절","형용사절"],          open:false},
+  {n:35, title:"Human Rights",                      topic:"인권",             words:189, tags:["수동태","조동사"],           open:false},
+  {n:36, title:"Food Security",                     topic:"식량 안보",         words:194, tags:["현재완료","가정법"],          open:false},
+  {n:37, title:"Digital Literacy",                  topic:"디지털 리터러시",   words:176, tags:["관계대명사","분사"],          open:false},
+  {n:38, title:"Olympic Dreams",                    topic:"올림픽·도전",       words:162, tags:["과거완료","접속사"],          open:false},
+  {n:39, title:"Global Citizenship",                topic:"세계 시민",         words:187, tags:["조동사","명사절"],           open:false},
+  {n:40, title:"Looking Ahead",                     topic:"미래·희망",         words:175, tags:["가정법","미래시제"],          open:false},
+];
+
+const LOCAL_KEY = 'withon_session_v2';
+let session = null;
+let scores  = {};
+let filter  = 'all';
+let query   = '';
+
+/* API 호출 — SCRIPT_URL 미설정 시 오프라인 모드 */
+async function api(payload) {
+  if (!SCRIPT_URL || SCRIPT_URL.includes('여기에')) {
+    return { ok: true, _offline: true };
+  }
+  try {
+    const res = await fetch(SCRIPT_URL, { method:'POST', body: JSON.stringify(payload) });
+    return await res.json();
+  } catch(e) {
+    return { ok: false, _offline: true };
+  }
+}
+
+function showToast(msg, ms=2400) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), ms);
+}
+
+/* ── 로그인 ── */
+async function doLogin() {
+  const name  = document.getElementById('inputName').value.trim();
+  const klass = document.getElementById('inputClass').value;
+  const err   = document.getElementById('loginError');
+  const btn   = document.getElementById('loginBtn');
+
+  if (!name || !klass) {
+    err.style.display = 'block';
+    err.textContent   = '이름과 반을 모두 입력해주세요';
+    return;
+  }
+  err.style.display = 'none';
+  btn.disabled      = true;
+  btn.innerHTML     = '<span class="spinner"></span>연결 중...';
+
+  const res = await api({ action:'register', name, class:klass });
+
+  if (res.ok) {
+    session = {
+      studentId: res.studentId || ('local_' + Date.now()),
+      name,
+      class: klass
+    };
+    localStorage.setItem(LOCAL_KEY, JSON.stringify(session));
+    await loadScores();
+    enterHub();
+    if (!res._offline) showToast(`반가워요, ${name}! 🎉`);
+  } else {
+    btn.disabled    = false;
+    btn.textContent = '시작하기';
+    err.style.display = 'block';
+    err.textContent   = '연결 오류가 있어요. 잠시 후 다시 시도해주세요.';
+  }
+}
+
+async function loadScores() {
+  const res = await api({ action:'getScores', studentId:session.studentId, class:session.class });
+  if (res.ok && res.scores && Object.keys(res.scores).length > 0) {
+    scores = res.scores;
+  } else {
+    /* 오프라인 또는 첫 방문 → 로컬 백업 사용 */
+    const backup = localStorage.getItem('withon_scores_' + session.studentId);
+    scores = backup ? JSON.parse(backup) : {};
+  }
+}
+
+function enterHub() {
+  document.getElementById('loginWrap').style.display   = 'none';
+  document.getElementById('mainWrap').style.display    = 'block';
+  document.getElementById('userChip').style.display    = 'flex';
+  document.getElementById('userName').textContent      = session.name;
+  document.getElementById('avatarText').textContent    = session.name[0];
+  document.getElementById('dashTitle').textContent     = `${session.name}의 학습 현황`;
+  document.getElementById('dashSub').textContent       = `${session.class} · 전체 40 유닛`;
+  updateStats();
+  render();
+}
+
+function showLogoutConfirm() {
+  document.getElementById('logoutName').textContent = session.name;
+  document.getElementById('logoutOverlay').classList.add('open');
+}
+function doLogout() {
+  session = null; scores = {};
+  localStorage.removeItem(LOCAL_KEY);
+  document.getElementById('logoutOverlay').classList.remove('open');
+  document.getElementById('loginWrap').style.display  = 'flex';
+  document.getElementById('mainWrap').style.display   = 'none';
+  document.getElementById('userChip').style.display   = 'none';
+  document.getElementById('inputName').value          = '';
+  document.getElementById('inputClass').value         = '';
+  document.getElementById('loginBtn').disabled        = false;
+  document.getElementById('loginBtn').textContent     = '시작하기';
+}
+
+/* ── 점수 수신 (unit 앱에서 호출) ──
+   unit 앱 완료 시: window.opener?.receiveScore(3, 87)
+   또는 URL 파라미터로 돌아올 때 자동 처리됨 */
+window.receiveScore = async function(unitNum, score) {
+  if (!session) return;
+  if (!scores[unitNum] || score > scores[unitNum]) {
+    scores[unitNum] = score;
+    localStorage.setItem('withon_scores_' + session.studentId, JSON.stringify(scores));
+    const res = await api({
+      action:'saveScore', studentId:session.studentId,
+      class:session.class, unitNum, score
+    });
+    updateStats(); render();
+    showToast(res._offline
+      ? `Unit ${String(unitNum).padStart(2,'0')} 완료! (오프라인 저장됨)`
+      : `Unit ${String(unitNum).padStart(2,'0')} ${score}점 저장 완료!`
+    );
+  }
+};
+
+/* ── 통계 ── */
+function updateStats() {
+  const keys = Object.keys(scores).map(Number);
+  const done = keys.length;
+  const vals = keys.map(k => scores[k]).filter(v => typeof v === 'number');
+  const avg  = vals.length ? Math.round(vals.reduce((a,b)=>a+b,0)/vals.length) : null;
+  const pct  = Math.round((done/40)*100);
+  document.getElementById('sDone').textContent = done;
+  document.getElementById('sAvg').textContent  = avg !== null ? avg+'%' : '—';
+  document.getElementById('sLeft').textContent = 40 - done;
+  document.getElementById('sPct').textContent  = pct+'%';
+  document.getElementById('pBar').style.width  = pct+'%';
+}
+
+/* ── 그리드 렌더 ── */
+function render() {
+  const grid = document.getElementById('unitGrid');
+  const list = UNITS.filter(u => {
+    if (filter==='done' && !scores[u.n]) return false;
+    if (filter==='open' && (!u.open || scores[u.n])) return false;
+    const q = query.toLowerCase();
+    if (q && !u.title.toLowerCase().includes(q) && !u.topic.includes(q) && !(u.n+'').includes(q)) return false;
+    return true;
+  });
+  document.getElementById('gridCount').textContent = list.length+'개';
+  if (!list.length) { grid.innerHTML='<div class="empty-state">검색 결과가 없어요</div>'; return; }
+  grid.innerHTML = list.map(u => {
+    const isDone   = !!scores[u.n];
+    const isLocked = !u.open && !isDone;
+    const chip = isDone ? `<div class="score-chip">${scores[u.n]}점</div>`
+               : u.isNew ? `<div class="new-chip">NEW</div>` : '';
+    return `<div class="unit-card${isDone?' done':''}${isLocked?' locked':''}"
+      onclick="${isLocked ? '' : 'openModal('+u.n+')'}" role="button" tabindex="0">
+      ${chip}
+      <div class="unit-num">
+        <span class="dot ${isDone?'dot-done':u.open?'dot-open':'dot-lock'}"></span>
+        Unit ${String(u.n).padStart(2,'0')}
+      </div>
+      <div class="unit-name">${u.title}</div>
+      <div class="unit-topic">${u.topic}</div>
+    </div>`;
+  }).join('');
+}
+
+/* ── 유닛 모달 ── */
+function openModal(n) {
+  const u = UNITS.find(x=>x.n===n); if (!u) return;
+  const isDone = !!scores[u.n];
+  const numStr = `Unit ${String(n).padStart(2,'0')}`;
+  const tags   = u.tags.map(t=>`<span class="g-tag">${t}</span>`).join('');
+  let inner = '';
+  if (isDone) {
+    inner = `<span class="modal-tag tag-done">완료</span>
+      <h3>${numStr}<br>${u.title}</h3>
+      <p class="modal-meta">${u.topic} · ${u.words} words</p>
+      <div class="grammar-tags">${tags}</div>
+      <div class="modal-score"><span>최고 점수</span><strong>${scores[u.n]}점</strong></div>
+      <div class="btn-row">
+        <button class="btn-main" onclick="goApp('${u.file}',${n})">다시 복습하기</button>
+        <button class="btn-sub" onclick="closeModal()">닫기</button>
+      </div>`;
+  } else {
+    inner = `<span class="modal-tag tag-open">복습 앱 준비됨</span>
+      <h3>${numStr}<br>${u.title}</h3>
+      <p class="modal-meta">${u.topic} · ${u.words} words</p>
+      <div class="grammar-tags">${tags}</div>
+      <div class="btn-row">
+        <button class="btn-main" onclick="goApp('${u.file}',${n})">복습 시작하기</button>
+        <button class="btn-sub" onclick="closeModal()">닫기</button>
+      </div>`;
+  }
+  document.getElementById('modalInner').innerHTML = inner;
+  document.getElementById('modalOverlay').classList.add('open');
+}
+function closeModal() { document.getElementById('modalOverlay').classList.remove('open'); }
+document.getElementById('modalOverlay').addEventListener('click', e => {
+  if (e.target === document.getElementById('modalOverlay')) closeModal();
+});
+
+/* unit 앱으로 이동할 때 학생 정보를 URL 파라미터로 전달 */
+function goApp(file, unitNum) {
+  if (!file || !session) return;
+  const p = new URLSearchParams({ sid:session.studentId, name:session.name, class:session.class, unit:unitNum });
+  window.location.href = `${file}?${p}`;
+}
+
+/* unit 앱이 점수를 URL 파라미터로 돌려보낼 때 자동 수신 */
+(function checkReturnScore() {
+  const p = new URLSearchParams(window.location.search);
+  const score = p.get('score'); const unit = p.get('unit');
+  if (score && unit) {
+    // URL 정리
+    window.history.replaceState({}, '', window.location.pathname);
+    // 세션 복원 후 점수 저장
+    const saved = localStorage.getItem(LOCAL_KEY);
+    if (saved) {
+      session = JSON.parse(saved);
+      loadScores().then(() => {
+        window.receiveScore(parseInt(unit), parseInt(score));
+        enterHub();
+      });
+      return;
+    }
+  }
+  /* 일반 방문 — 자동 로그인 */
+  const saved = localStorage.getItem(LOCAL_KEY);
+  if (saved) {
+    try {
+      session = JSON.parse(saved);
+      loadScores().then(enterHub);
+    } catch(e) { localStorage.removeItem(LOCAL_KEY); }
+  }
+})();
+
+function setFilter(f,btn) {
+  filter=f;
+  document.querySelectorAll('.f-btn').forEach(b=>b.classList.remove('on'));
+  btn.classList.add('on'); render();
+}
+function doSearch(v) { query=v.trim(); render(); }
+</script>
+</body>
+</html>
