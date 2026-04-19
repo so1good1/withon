@@ -570,19 +570,31 @@ async function submitAI() {
 한국어로 작성하고, 중학생이 이해하기 쉬운 말로 써주세요.`;
 
   try {
-    const res  = await fetch("https://api.anthropic.com/v1/messages", {
-      method:"POST",
-      headers:{"Content-Type":"application/json"},
+async function submitAI() {
+  const answer = document.getElementById('aiAnswer').value.trim();
+  if (!answer)              { toast('답을 먼저 입력해주세요'); return; }
+  if (selectedAiQ === null) { toast('문제를 먼저 선택해주세요'); return; }
+
+  const btn  = document.getElementById('aiBtn');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner"></span>채점 중...';
+
+  const resp = document.getElementById('aiResponse');
+  resp.style.display = 'block';
+  resp.textContent   = 'AI가 분석 중이에요...';
+
+  try {
+    const res  = await fetch("https://script.google.com/macros/s/AKfycbxc2t3Da0hTeK3NBsO_bKvLc4pW2xUUvtPFJ7mKPtHabI-rOY4ZI9lz7XM2-PlwLcAcHQ/exec", {
+      method: "POST",
       body: JSON.stringify({
-        model:"claude-sonnet-4-20250514",
-        max_tokens:1000,
-        system: systemPrompt,
-        messages:[{ role:"user", content:`문제: ${AI_PROMPTS[selectedAiQ]}\n\n학생 답변: ${answer}` }]
+        action: "gradeAI",
+        prompt: AI_PROMPTS[selectedAiQ],
+        answer: answer,
+        grade:  "중2"
       })
     });
     const data = await res.json();
-    const text = data.content?.map(c=>c.text||'').join('') || '응답을 받지 못했어요.';
-    resp.textContent = text;
+    resp.textContent = data.ok ? data.text : '채점 오류가 발생했어요.';
   } catch(e) {
     resp.textContent = '오류가 발생했어요. 다시 시도해주세요.';
   }
@@ -590,49 +602,3 @@ async function submitAI() {
   btn.disabled    = false;
   btn.textContent = 'AI 채점 받기';
 }
-
-/* ════════ 요약 & 헤더 ════════ */
-function updateSummary() {
-  ['vocab','reading','grammar'].forEach(k => {
-    const el = document.getElementById('sum' + k.charAt(0).toUpperCase() + k.slice(1));
-    el.textContent = scores[k] !== null ? scores[k]+'%' : '—';
-  });
-}
-
-function updateHeader() {
-  const vals = Object.values(scores).filter(v => v !== null);
-  const avg  = vals.length ? Math.round(vals.reduce((a,b)=>a+b,0)/vals.length) : null;
-  document.getElementById('headerScore').textContent = avg !== null ? avg+'점' : '—';
-}
-
-/* ════════ 완료 & 점수 전송 ════════ */
-function finishUnit() {
-  const vals = Object.values(scores).filter(v => v !== null);
-  if (!vals.length) { toast('먼저 한 탭이라도 채점해보세요!'); return; }
-  const avg = Math.round(vals.reduce((a,b)=>a+b,0)/vals.length);
-
-  /* index.html로 점수 전달 후 이동 */
-  if (window.opener && window.opener.receiveScore) {
-    window.opener.receiveScore(UNIT_NUM, avg);
-    window.close();
-  } else {
-    /* 같은 탭에서 열렸을 때: URL 파라미터로 점수 전달 */
-    toast(`${avg}점 저장됐어요! 허브로 돌아갈게요 🎉`, 1800);
-    setTimeout(() => {
-      window.location.href = `index.html?score=${avg}&unit=${UNIT_NUM}`;
-    }, 1900);
-  }
-}
-
-function goBack() {
-  if (window.history.length > 1) window.history.back();
-  else window.location.href = 'index.html';
-}
-
-/* ── 초기화 ── */
-buildVocab();
-buildReading();
-buildGrammar();
-</script>
-</body>
-</html>
